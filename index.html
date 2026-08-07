@@ -547,6 +547,13 @@ function closeForm(){
 document.getElementById('openAddBtn').addEventListener('click', () => openForm(null));
 document.getElementById('cancelBtn').addEventListener('click', closeForm);
 
+const idInput = document.getElementById('f-id');
+idInput.addEventListener('input', () => {
+  const pos = idInput.selectionStart;
+  idInput.value = idInput.value.toUpperCase();
+  idInput.setSelectionRange(pos, pos);
+});
+
 document.getElementById('saveBtn').addEventListener('click', async () => {
   const nickname = document.getElementById('f-nickname').value.trim();
   const id = document.getElementById('f-id').value.trim();
