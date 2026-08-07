@@ -402,12 +402,27 @@ function escapeHtml(str){
 }
 
 async function ensureBoard(){
+  const LS_KEY = 'ggd-roster-last-board';
   const params = new URLSearchParams(location.search);
-  const existing = params.get('board');
-  if(existing){
-    boardId = existing;
+  const fromUrl = params.get('board');
+
+  if(fromUrl){
+    boardId = fromUrl;
+    try{ localStorage.setItem(LS_KEY, boardId); }catch(e){}
     return;
   }
+
+  let fromLocal = null;
+  try{ fromLocal = localStorage.getItem(LS_KEY); }catch(e){}
+
+  if(fromLocal){
+    boardId = fromLocal;
+    const url = new URL(location.href);
+    url.searchParams.set('board', boardId);
+    history.replaceState(null, '', url.toString());
+    return;
+  }
+
   setStatus('공유 목록을 처음 만드는 중...');
   try{
     const res = await fetch(API_BASE, {
@@ -417,6 +432,7 @@ async function ensureBoard(){
     });
     const loc = res.headers.get('Location') || res.headers.get('location') || res.url;
     boardId = loc.split('/').filter(Boolean).pop();
+    try{ localStorage.setItem(LS_KEY, boardId); }catch(e){}
     const url = new URL(location.href);
     url.searchParams.set('board', boardId);
     history.replaceState(null, '', url.toString());
